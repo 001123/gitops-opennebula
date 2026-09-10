@@ -1,0 +1,84 @@
+# OpenNebula dev (RKE2): ephemeral storage, one replica, private NodePort access.
+alertmanager:
+  enabled: false
+
+defaultRules:
+  create: true
+  rules:
+    alertmanager: false
+    etcd: false
+    kubeControllerManager: false
+    kubeProxy: false
+    kubeSchedulerAlerting: false
+    kubeSchedulerRecording: false
+  disabled:
+    PrometheusNotConnectedToAlertmanagers: true
+
+# Enable these only after validating access to the RKE2 metrics endpoints.
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+
+kubeApiServer:
+  enabled: true
+kubelet:
+  enabled: true
+kubeStateMetrics:
+  enabled: true
+nodeExporter:
+  enabled: true
+prometheusOperator:
+  enabled: true
+
+grafana:
+  enabled: true
+  replicas: 1
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+  service:
+    type: NodePort
+    nodePort: 30300
+  ingress:
+    enabled: false
+  persistence:
+    enabled: false
+  defaultDashboardsEnabled: true
+  sidecar:
+    datasources:
+      enabled: true
+      defaultDatasourceEnabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+prometheus:
+  enabled: true
+  service:
+    type: ClusterIP
+  ingress:
+    enabled: false
+  prometheusSpec:
+    replicas: 1
+    retention: 2d
+    retentionSize: 2GiB
+    # Disk-backed emptyDir: data is lost when the pod is recreated.
+    storageSpec:
+      emptyDir: {}
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 2Gi
