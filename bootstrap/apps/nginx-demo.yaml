@@ -10,7 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/your-org/gitops-opennebula.git
+    repoURL: https://github.com/001123/gitops-opennebula.git
     targetRevision: HEAD
     path: apps/nginx-demo/base
     plugin:

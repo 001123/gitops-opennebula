@@ -10,8 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    # Thay thế bằng URL git repo thực tế của bạn (hoặc repo local/gitea/gitlab/github)
-    repoURL: https://github.com/your-org/gitops-opennebula.git
+    repoURL: https://github.com/001123/gitops-opennebula.git
     targetRevision: HEAD
     path: apps/nginx-demo/base
     plugin:

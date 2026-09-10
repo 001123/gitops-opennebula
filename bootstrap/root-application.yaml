@@ -10,8 +10,7 @@ metadata:
 spec:
   project: default
   source:
-    # Cập nhật repoURL bằng URL repository GitOps thực tế của bạn
-    repoURL: https://github.com/your-org/gitops-opennebula.git
+    repoURL: https://github.com/001123/gitops-opennebula.git
     targetRevision: HEAD
     path: bootstrap/apps
   destination:
