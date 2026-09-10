@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-demo
+  namespace: demo-nginx
+  labels:
+    app.kubernetes.io/name: nginx-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: nginx-demo
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: nginx-demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+          env:
+            - name: ADMIN_EMAIL
+              valueFrom:
+                secretKeyRef:
+                  name: nginx-demo-secret
+                  key: ADMIN_EMAIL
+                  optional: true
+          volumeMounts:
+            - name: html-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: html-volume
+          configMap:
+            name: nginx-demo-content

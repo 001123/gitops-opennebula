@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nginx-demo
+  namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: gitops-root
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/your-org/gitops-opennebula.git
+    targetRevision: HEAD
+    path: apps/nginx-demo/base
+    plugin:
+      name: sops
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: demo-nginx
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

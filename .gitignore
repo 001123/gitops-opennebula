@@ -1,0 +1,16 @@
+# Private Keys & Credentials (CRITICAL - DO NOT COMMIT)
+credentials/
+*.agekey
+*.key
+*.pem
+id_rsa*
+*.dec.yaml
+*.dec.yml
+
+# OS / Editor temporary files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+*.tmp

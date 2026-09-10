@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-application
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: root-application
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    # Cập nhật repoURL bằng URL repository GitOps thực tế của bạn
+    repoURL: https://github.com/your-org/gitops-opennebula.git
+    targetRevision: HEAD
+    path: bootstrap/apps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
