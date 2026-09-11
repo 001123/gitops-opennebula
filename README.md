@@ -161,6 +161,21 @@ kdev -n argocd annotate application monitoring argocd.argoproj.io/refresh=hard -
 kdev -n monitoring get secret grafana-admin -o jsonpath='{.data.admin-password}' | base64 --decode
 ```
 
+**Đường mạng LAN → NodePort:** host `mini-ubuntu` (`192.168.250.3`) phải bật
+`net.ipv4.ip_forward=1`; cấu hình được lưu tại
+`/etc/sysctl.d/99-opennebula-forwarding.conf`. Do đường trả về của node đi qua
+router OneKS, host dùng thêm rule NAT dưới đây để lưu lượng LAN tới Grafana
+trả về cùng đường. Rule chỉ áp dụng TCP `30300`, được lưu trong bảng `nat` của
+`/etc/iptables/rules.v4` và nạp bởi `netfilter-persistent` khi boot:
+
+```text
+-A POSTROUTING -s 192.168.250.0/24 -d 172.20.0.0/24 -o br-priv -p tcp --dport 30300 -j MASQUERADE
+```
+
+Nếu NodePort lỗi sau khi host khởi động lại, kiểm tra các VM router/control-plane/
+worker đang chạy, bridge `br-priv` UP, IP forwarding và rule NAT còn hiệu lực.
+Grafana sẽ nhìn thấy IP nguồn của host thay cho IP client LAN với đường truy cập này.
+
 Prometheus chỉ mở trong cluster; truy cập tạm thời qua:
 
 ```bash
