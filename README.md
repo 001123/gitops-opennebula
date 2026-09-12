@@ -11,7 +11,11 @@ gitops-opennebula/
 ├── .gitignore                      # Loại trừ private keys, certs và file giải mã
 ├── .sops.yaml                      # Cấu hình quy tắc mã hóa của SOPS với Public Age Key
 ├── README.md                       # Hướng dẫn sử dụng & quy trình vận hành
-├── bootstrap/                      # Thư mục khởi tạo hệ thống GitOps (App of Apps)
+├── bootstrap/                      # Thư mục khởi tạo hệ thống GitOps (App of Apps & Ansible)
+│   ├── ansible/                    # Bộ playbook & role Ansible cài đặt ArgoCD + SOPS/Age
+│   │   ├── playbooks/argocd.yml
+│   │   ├── roles/argocd/
+│   │   └── requirements.yml
 │   ├── root-application.yaml       # ArgoCD Root Application (theo dõi bootstrap/apps/)
 │   └── apps/                       # Chứa khai báo Application CRD cho từng ứng dụng
 │       ├── nginx-demo.yaml         # Application CRD cho ứng dụng Nginx Demo
@@ -65,12 +69,27 @@ Tạo file `secret.yaml` chứa thông tin nhạy cảm, sau đó chạy:
 
 ---
 
-## 🔄 Mô hình App of Apps
+## 🚀 Khởi tạo & Vận hành GitOps (App of Apps)
 
-1. Khi triển khai lần đầu, bạn chỉ cần nạp **Root Application**:
-   ```bash
-   kubectl apply -f bootstrap/root-application.yaml
-   ```
+### Bước 1: Triển khai Argo CD + SOPS CMP vào cụm Kubernetes
+Chạy playbook Ansible từ thư mục `bootstrap/ansible`:
+```bash
+cd bootstrap/ansible
+# Cài collection kubernetes.core nếu chưa có
+ansible-galaxy collection install -r requirements.yml
+
+# Triển khai Argo CD với cấu hình kubeconfig cụm dev
+ansible-playbook -i localhost, playbooks/argocd.yml \
+  -e argocd_kubeconfig="$HOME/.kube/config-opennebula-dev" \
+  -e argocd_context=default
+cd ../..
+```
+
+### Bước 2: Nạp Root Application
+Sau khi Argo CD đã sẵn sàng, kích hoạt cây ứng dụng App of Apps:
+```bash
+kubectl --kubeconfig="$HOME/.kube/config-opennebula-dev" apply -f bootstrap/root-application.yaml
+```
 2. **Root Application** sẽ liên tục giám sát thư mục `bootstrap/apps/`.
 3. Khi bạn muốn thêm một dịch vụ mới:
    - Tạo thư mục ứng dụng trong `apps/<ten-ung-dung>/base/`.
